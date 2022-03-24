@@ -8,6 +8,9 @@ export default NextAuth({
       clientSecret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
     }),
   ],
+  pages: {
+    signIn: "/login",
+  },
   callbacks: {
     async session({ session, token }) {
       session.user.tag = session.user.name
@@ -16,6 +19,8 @@ export default NextAuth({
         .toLocaleLowerCase();
 
       session.user.uid = token.sub;
+      console.log(token);
+      console.log(session);
       return session;
     },
   },
