@@ -1,3 +1,4 @@
+import { AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRecoilState } from "recoil";
 
@@ -19,8 +20,7 @@ const Layout = ({ trendingResults, followResults, children }) => {
           trendingResults={trendingResults}
           followResults={followResults}
         />
-
-        {isOpen && <Modal />}
+        <AnimatePresence>{isOpen && <Modal />}</AnimatePresence>
       </main>
     </div>
   );
