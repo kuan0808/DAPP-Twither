@@ -11,15 +11,12 @@ import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import { useSession } from "next-auth/react";
 
-import { createTweet } from "../services/tweetService";
-
 const Input = () => {
   const { data: session } = useSession();
   const [input, setInput] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [showEmojis, setShowEmojis] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
 
   const filePickerRef = useRef(null);
   const textAreaRef = useRef(null);
@@ -48,20 +45,32 @@ const Input = () => {
 
   const submitPost = async () => {
     if (loading) return;
-    setError(false);
     setLoading(true);
     setShowEmojis(false);
 
-    try {
-      let body = { text: input, file: selectedFile };
-      await createTweet(session, body);
-      setInput("");
-      setSelectedFile(null);
-    } catch (error) {
-      console.log(error);
-      setError(true);
+    const docRef = await addDoc(collection(db, "posts"), {
+      id: session.user.uid,
+      username: session.user.name,
+      userImg: session.user.image,
+      tag: session.user.tag,
+      text: input,
+      timestamp: serverTimestamp(),
+    });
+
+    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+
+    if (selectedFile) {
+      await uploadString(imageRef, selectedFile, "data_url").then(async () => {
+        const downloadURL = await getDownloadURL(imageRef);
+        await updateDoc(doc(db, "posts", docRef.id), {
+          image: downloadURL,
+        });
+      });
     }
+
     setLoading(false);
+    setInput("");
+    setSelectedFile(null);
   };
 
   return (
