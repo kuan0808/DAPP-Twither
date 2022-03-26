@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.9;
 
 import "./utils/BaseController.sol";
 import "./ContractManager.sol";
@@ -12,8 +12,8 @@ contract Controller is BaseController {
     UserStorage _userStorage;
     CommentStorage _commentStorage;
 
-    function initialize(address _managerAddr) public onlyOwner {
-        ContractManager _manager = ContractManager(_managerAddr);
+    function initialize() public onlyOwner {
+        ContractManager _manager = ContractManager(managerAddr);
         address _userStorageAddr = _manager.getAddress("UserStorage");
         address _tweetStorageAddr = _manager.getAddress("TweetStorage");
         address _commentStorageAddr = _manager.getAddress("CommentStorage");
