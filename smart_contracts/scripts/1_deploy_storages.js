@@ -18,9 +18,6 @@ async function main() {
     TweetStorage: { address: tweetStorage.address },
     CommentStorage: { address: commentStorage.address },
   });
-
-  if (contracts.ContractManager.address) {
-  }
 }
 
 main()

@@ -5,7 +5,7 @@ let fs = require("fs"),
 
 exports.contractJsonMaker = async function create_json(contractInfo) {
   let contracts = {};
-  if (!fs.readFileSync(filePath).length == 0) {
+  if (!fs.readFileSync(filePath) === "{}") {
     contracts = JSON.parse(fs.readFileSync(filePath));
   } else {
     const [
@@ -52,5 +52,5 @@ exports.contractJsonMaker = async function create_json(contractInfo) {
 };
 
 exports.resetJson = function () {
-  fs.writeFileSync(filePath, "");
+  fs.writeFileSync(filePath, "{}");
 };
