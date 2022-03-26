@@ -1,16 +1,28 @@
+const util = require("../utils/create_json");
 const hre = require("hardhat");
+const fs = require("fs");
+const contracts = require("../contracts.json");
 
 async function main() {
   const UserStorage = await hre.ethers.getContractFactory("UserStorage");
-  const userStorage = await UserStorage.deploy("Hello, Hardhat!");
+  const userStorage = await UserStorage.deploy();
 
-  await userStorage.deployed();
+  const TweetStorage = await hre.ethers.getContractFactory("TweetStorage");
+  const tweetStorage = await TweetStorage.deploy();
 
-  console.log("UserStorage deployed to:", greeter.address);
+  const CommentStorage = await hre.ethers.getContractFactory("CommentStorage");
+  const commentStorage = await CommentStorage.deploy();
+
+  await util.contractJsonMaker({
+    UserStorage: { address: userStorage.address },
+    TweetStorage: { address: tweetStorage.address },
+    CommentStorage: { address: commentStorage.address },
+  });
+
+  if (contracts.ContractManager.address) {
+  }
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main()
   .then(() => process.exit(0))
   .catch((error) => {
