@@ -16,6 +16,11 @@ contract UserStorage is BaseStorage, IUserStorage {
         uint256 _userId,
         uint256 _timestamp
     );
+    event UserUpdated(
+        address indexed _userAddr,
+        uint256 _userId,
+        uint256 _timestamp
+    );
 
     // Use for assigning unique ids to users
     using Counters for Counters.Counter;
@@ -76,6 +81,11 @@ contract UserStorage is BaseStorage, IUserStorage {
         profile.username = _username;
         profile.image_uri = _image_uri;
         profiles[_userAddr] = profile;
+        emit UserUpdated(
+            _userAddr,
+            profiles[_userAddr].userId,
+            block.timestamp
+        );
         return profiles[_userAddr].userId;
     }
 
