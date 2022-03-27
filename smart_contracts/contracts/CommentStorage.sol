@@ -104,10 +104,6 @@ contract CommentStorage is BaseStorage, ICommentStorage {
     function _removeCommentFromAuthor(address _authorAddr, uint256 _commentId)
         private
     {
-        require(
-            authorOf(_commentId) == _authorAddr,
-            "CommentStorage: This Comment do not belong to this author"
-        );
         uint256 lastIndex = _commentsOfAuthor[_authorAddr].length - 1;
         uint256 commentIndex = _commentsOfAuthorIndex[_commentId];
 
@@ -219,5 +215,16 @@ contract CommentStorage is BaseStorage, ICommentStorage {
             _commentId,
             block.timestamp
         );
+    }
+
+    function deleteAllCommentsOfUser(address _userAddr)
+        external
+        onlyController
+    {
+        uint256[] memory commentIds = _commentsOfAuthor[_userAddr];
+        uint256 count = commentIds.length;
+        for (uint256 i = 0; i < count; i++) {
+            deleteComment(_userAddr, commentIds[i]);
+        }
     }
 }

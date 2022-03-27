@@ -65,14 +65,6 @@ contract TweetStorage is BaseStorage, ITweetStorage {
     }
 
     function _removeTweetFromAuthor(address _from, uint256 _tweetId) private {
-        require(
-            authorOf(_tweetId) == _from,
-            "TweetStorage: User does not own this tweet"
-        );
-        require(
-            _ownedTweets[_from].length > 0,
-            "TweetStorage: User has no tweets"
-        );
         uint256 lastIndex = _ownedTweets[_from].length - 1;
         uint256 tweetIndex = _ownedTweetsIndex[_tweetId];
 
@@ -138,11 +130,6 @@ contract TweetStorage is BaseStorage, ITweetStorage {
         public
         onlyController
     {
-        require(_exists(_tweetId), "Tweet does not exist");
-        require(
-            authorOf(_tweetId) == _from || _from == owner(),
-            "TweetStorage: User does not own this tweet"
-        );
         _removeTweetFromAuthor(_from, _tweetId);
         _removeTweetFromAllTweets(_tweetId);
         delete tweets[_tweetId];
@@ -150,14 +137,11 @@ contract TweetStorage is BaseStorage, ITweetStorage {
         emit TweetDeleted(_from, _tweetId, block.timestamp);
     }
 
-    function deleteAllTweetsOfUser(address _deletedUserAddr)
-        external
-        onlyController
-    {
-        uint256[] memory tweetIds = _ownedTweets[_deletedUserAddr];
+    function deleteAllTweetsOfUser(address _userAddr) external onlyController {
+        uint256[] memory tweetIds = _ownedTweets[_userAddr];
         uint256 count = tweetIds.length;
         for (uint256 i = 0; i < count; i++) {
-            deleteTweet(_deletedUserAddr, tweetIds[i]);
+            deleteTweet(_userAddr, tweetIds[i]);
         }
     }
 }

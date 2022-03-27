@@ -27,19 +27,65 @@ contract Controller is BaseController, IController {
     }
 
     function createUser(bytes32 _username, string memory _image_uri)
-        public
+        external
         returns (uint256)
     {
         IUserStorage _userStorage = IUserStorage(userStorageAddr);
+        require(
+            !_userStorage._exists(msg.sender),
+            "Controller: User already exists"
+        );
         return _userStorage.createUser(msg.sender, _username, _image_uri);
     }
 
-    function deleteMyProfileAndAll() external {
+    function updateUserProfile(bytes32 _username, string memory _image_uri)
+        external
+        returns (uint256)
+    {
         IUserStorage _userStorage = IUserStorage(userStorageAddr);
-        ITweetStorage _tweetStorage = ITweetStorage(tweetStorageAddr);
-        _userStorage = IUserStorage(userStorageAddr);
+        require(
+            _userStorage._exists(msg.sender),
+            "Controller: User does not exist"
+        );
+        return
+            _userStorage.updateUserProfile(msg.sender, _username, _image_uri);
+    }
+
+    function deleteUser() external {
+        IUserStorage _userStorage = IUserStorage(userStorageAddr);
+        require(
+            _userStorage._exists(msg.sender),
+            "Controller: User does not exist"
+        );
         _userStorage.deleteUser(msg.sender);
-        _tweetStorage.deleteAllTweetsOfUser(msg.sender);
+    }
+
+    function deleteAllTweetsOfUser(address _userAddr) external {
+        require(
+            _userAddr != address(0),
+            "Controller: User address cannot be zero"
+        );
+        ITweetStorage _tweetStorage = ITweetStorage(tweetStorageAddr);
+        IUserStorage _userStorage = IUserStorage(userStorageAddr);
+        require(
+            _userStorage._exists(msg.sender),
+            "Controller: User does not exist"
+        );
+        _tweetStorage.deleteAllTweetsOfUser(_userAddr);
+    }
+
+    function deleteAllCommentsOfUser(address _userAddr) external {
+        require(
+            _userAddr != address(0),
+            "Controller: User address cannot be zero"
+        );
+        ICommentStorage _commentStorage = ICommentStorage(commentStorageAddr);
+        IUserStorage _userStorage = IUserStorage(userStorageAddr);
+        require(
+            _userStorage._exists(msg.sender),
+            "Controller: User does not exist"
+        );
+        _commentStorage.deleteAllCommentsOfUser(_userAddr);
     }
 
     function createTweet(string memory _text, string memory _photoUri)
@@ -50,13 +96,21 @@ contract Controller is BaseController, IController {
         IUserStorage _userStorage = IUserStorage(userStorageAddr);
         require(
             _userStorage._exists(msg.sender),
-            "UserStorage: User does not exist"
+            "Controller: User does not exist"
         );
         return _tweetStorage.createTweet(msg.sender, _text, _photoUri);
     }
 
     function deleteTweet(uint256 _tweetId) external {
         ITweetStorage _tweetStorage = ITweetStorage(tweetStorageAddr);
+        require(
+            _tweetStorage._exists(_tweetId),
+            "Controller: Tweet does not exist"
+        );
+        require(
+            _tweetStorage.authorOf(_tweetId) == msg.sender,
+            "Controller: Tweet does not belong to user"
+        );
         _tweetStorage.deleteTweet(msg.sender, _tweetId);
     }
 
@@ -82,6 +136,15 @@ contract Controller is BaseController, IController {
 
     function deleteComment(uint256 _commentId) external {
         ICommentStorage _commentStorage = ICommentStorage(commentStorageAddr);
+        require(
+            _commentStorage._exists(_commentId),
+            "Controller: Comment does not exist"
+        );
+        require(
+            _commentStorage.authorOf(_commentId) == msg.sender,
+            "Controller: Comment does not belong to user"
+        );
+
         _commentStorage.deleteComment(msg.sender, _commentId);
     }
 }

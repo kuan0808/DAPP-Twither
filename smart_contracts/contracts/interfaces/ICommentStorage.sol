@@ -43,4 +43,6 @@ interface ICommentStorage {
     ) external returns (uint256);
 
     function deleteComment(address _from, uint256 _commentId) external;
+
+    function deleteAllCommentsOfUser(address _userAddr) external;
 }

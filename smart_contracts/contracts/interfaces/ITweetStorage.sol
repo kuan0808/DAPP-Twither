@@ -30,5 +30,5 @@ interface ITweetStorage {
 
     function deleteTweet(address _from, uint256 _tweetId) external;
 
-    function deleteAllTweetsOfUser(address _deletedUserAddr) external;
+    function deleteAllTweetsOfUser(address _userAddr) external;
 }

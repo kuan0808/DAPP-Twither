@@ -10,12 +10,18 @@ interface IUserStorage {
             address userAddr,
             bytes32 username,
             string memory image_uri,
-            bool exists
+            bool deleted
         );
 
     function _exists(address) external view returns (bool);
 
     function createUser(
+        address _userAddr,
+        bytes32 _username,
+        string memory _image_uri
+    ) external returns (uint256);
+
+    function updateUserProfile(
         address _userAddr,
         bytes32 _username,
         string memory _image_uri

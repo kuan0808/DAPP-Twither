@@ -35,7 +35,7 @@ contract UserStorage is BaseStorage, IUserStorage {
         address userAddr;
         bytes32 username;
         string image_uri;
-        bool exists;
+        bool deleted;
     }
 
     function _exists(address _userAddr)
@@ -44,7 +44,7 @@ contract UserStorage is BaseStorage, IUserStorage {
         onlyController
         returns (bool)
     {
-        return profiles[_userAddr].exists;
+        return profiles[_userAddr].userId > 0;
     }
 
     function createUser(
@@ -52,7 +52,6 @@ contract UserStorage is BaseStorage, IUserStorage {
         bytes32 _username,
         string memory _image_uri
     ) external onlyController returns (uint256) {
-        require(!_exists(_userAddr), "UserStorage: User already exists");
         _userCount.increment();
         uint256 newUserId = _userCount.current();
         profiles[_userAddr] = Profile(
@@ -60,7 +59,7 @@ contract UserStorage is BaseStorage, IUserStorage {
             _userAddr,
             _username,
             _image_uri,
-            true
+            false
         );
         _allUserIds.push(newUserId);
         _userIndex[newUserId] = _allUserIds.length - 1;
@@ -68,15 +67,27 @@ contract UserStorage is BaseStorage, IUserStorage {
         return newUserId;
     }
 
+    function updateUserProfile(
+        address _userAddr,
+        bytes32 _username,
+        string memory _image_uri
+    ) external onlyController returns (uint256) {
+        Profile memory profile = profiles[_userAddr];
+        profile.username = _username;
+        profile.image_uri = _image_uri;
+        profiles[_userAddr] = profile;
+        return profiles[_userAddr].userId;
+    }
+
     function deleteUser(address _from) external onlyController {
-        require(_exists(_from), "UserStorage: User does not exist");
         uint256 userId = profiles[_from].userId;
         uint256 lastIndex = _allUserIds.length - 1;
         uint256 userIndex = _userIndex[userId];
         _allUserIds[userIndex] = _allUserIds[lastIndex];
         _userIndex[_allUserIds[lastIndex]] = userIndex;
         _allUserIds.pop();
-        profiles[_from].exists = false;
+        delete profiles[_from];
+        profiles[_from].deleted = true;
 
         emit UserDeleted(_from, userId, block.timestamp);
     }

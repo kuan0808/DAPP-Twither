@@ -14,9 +14,17 @@ interface IController {
         external
         returns (uint256);
 
-    function deleteMyProfileAndAll() external;
+    function deleteUser() external;
+
+    function deleteAllTweetsOfUser(address _userAddr) external;
+
+    function deleteAllCommentsOfUser(address _userAddr) external;
 
     function createTweet(string memory _text, string memory _photoUri)
+        external
+        returns (uint256);
+
+    function updateUserProfile(bytes32 _username, string memory _image_uri)
         external
         returns (uint256);
 
