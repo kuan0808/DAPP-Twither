@@ -10,7 +10,7 @@ contract CommentStorage is BaseStorage, ICommentStorage {
         address indexed _author,
         uint256 indexed _tweetId,
         uint256 commentId,
-        uint256 _timestamp
+        uint256 _timestamp,
     );
 
     event CommentDeleted(
@@ -49,6 +49,7 @@ contract CommentStorage is BaseStorage, ICommentStorage {
         string text;
         uint256 timestamp;
         string photoUri;
+        bool deleted;
     }
 
     function _exists(uint256 _commentId)
@@ -184,7 +185,8 @@ contract CommentStorage is BaseStorage, ICommentStorage {
             newCommentId,
             _text,
             block.timestamp,
-            _photoUri
+            _photoUri,
+            false
         );
         emit CommentCreated(
             _authorAddr,
@@ -209,6 +211,7 @@ contract CommentStorage is BaseStorage, ICommentStorage {
         _removeCommentFromTweet(commentTo(_commentId), _commentId);
         _removeCommentFromAllComments(_commentId);
         delete comments[_commentId];
+        comments[_commentId].deleted = true;
         emit CommentDeleted(
             _from,
             commentTo(_commentId),

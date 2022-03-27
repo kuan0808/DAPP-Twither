@@ -11,7 +11,8 @@ interface ICommentStorage {
             uint256 commentId,
             string memory text,
             uint256 timestamp,
-            string memory photoUri
+            string memory photoUri,
+            bool deleted
         );
 
     function _exists(uint256 _commentId) external view returns (bool);
