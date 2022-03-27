@@ -2,9 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "./utils/BaseStorage.sol";
+import "./interfaces/ITweetStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract TweetStorage is BaseStorage {
+contract TweetStorage is BaseStorage, ITweetStorage {
     event TweetCreated(
         address indexed _author,
         uint256 _tweetId,
@@ -98,7 +99,11 @@ contract TweetStorage is BaseStorage {
         return tweets[_tweetId].authorAddr;
     }
 
-    function tweetsOf(address _author) public view returns (uint256[] memory) {
+    function tweetsOf(address _author)
+        external
+        view
+        returns (uint256[] memory)
+    {
         return _ownedTweets[_author];
     }
 
@@ -111,7 +116,7 @@ contract TweetStorage is BaseStorage {
         address _userAddr,
         string memory _text,
         string memory _photoUri
-    ) public onlyController returns (uint256) {
+    ) external onlyController returns (uint256) {
         _tweetCount.increment();
         uint256 newTweetId = _tweetCount.current();
         _addTweetToAuthor(_userAddr, newTweetId);
@@ -143,7 +148,7 @@ contract TweetStorage is BaseStorage {
     }
 
     function deleteAllTweetsOfUser(address _deletedUserAddr)
-        public
+        external
         onlyController
     {
         uint256[] memory tweetIds = _ownedTweets[_deletedUserAddr];

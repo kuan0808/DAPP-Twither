@@ -2,9 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "./utils/BaseStorage.sol";
+import "./interfaces/IUserStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract UserStorage is BaseStorage {
+contract UserStorage is BaseStorage, IUserStorage {
     event UserCreated(
         address indexed _userAddr,
         uint256 _userId,
@@ -50,7 +51,7 @@ contract UserStorage is BaseStorage {
         address _userAddr,
         bytes32 _username,
         string memory _image_uri
-    ) public onlyController returns (uint256) {
+    ) external onlyController returns (uint256) {
         require(!_exists(_userAddr), "User already exists");
         _userCount.increment();
         uint256 newUserId = _userCount.current();
@@ -67,7 +68,7 @@ contract UserStorage is BaseStorage {
         return newUserId;
     }
 
-    function deleteUser(address _from) public onlyController {
+    function deleteUser(address _from) external onlyController {
         require(_exists(_from), "User does not exist");
         uint256 userId = profiles[_from].userId;
         uint256 lastIndex = _allUserIds.length - 1;

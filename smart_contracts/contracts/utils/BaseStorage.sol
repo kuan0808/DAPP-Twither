@@ -2,8 +2,9 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "../interfaces/IBaseStorage.sol";
 
-contract BaseStorage is Ownable {
+contract BaseStorage is Ownable, IBaseStorage {
     address public controllerAddr;
 
     modifier onlyController() {

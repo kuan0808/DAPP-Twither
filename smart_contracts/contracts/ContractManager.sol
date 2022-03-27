@@ -2,22 +2,16 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/IContractManager.sol";
 
-contract ContractManager is Ownable {
-    mapping(string => address) addresses;
+contract ContractManager is Ownable, IContractManager {
+    mapping(bytes32 => address) public storageAddrs;
 
-    function setAddress(string memory _name, address _address)
-        public
-        onlyOwner
-    {
-        addresses[_name] = _address;
+    function setAddress(bytes32 _name, address _address) external onlyOwner {
+        storageAddrs[_name] = _address;
     }
 
-    function getAddress(string memory _name) public view returns (address) {
-        return addresses[_name];
-    }
-
-    function deleteAddress(string memory _name) public onlyOwner {
-        addresses[_name] = address(0);
+    function deleteAddress(bytes32 _name) external onlyOwner {
+        storageAddrs[_name] = address(0);
     }
 }

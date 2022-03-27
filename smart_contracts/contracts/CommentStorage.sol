@@ -2,10 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "./utils/BaseStorage.sol";
-import "./TweetStorage.sol";
+import "./interfaces/ICommentStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract CommentStorage is BaseStorage {
+contract CommentStorage is BaseStorage, ICommentStorage {
     event CommentCreated(
         address indexed _author,
         uint256 indexed _tweetId,
@@ -173,7 +173,7 @@ contract CommentStorage is BaseStorage {
         uint256 _tweetId,
         string memory _text,
         string memory _photoUri
-    ) public onlyController returns (uint256) {
+    ) external onlyController returns (uint256) {
         _commentCount.increment();
         uint256 newCommentId = _commentCount.current();
         _addCommentToTweet(_tweetId, newCommentId);
@@ -209,7 +209,7 @@ contract CommentStorage is BaseStorage {
     }
 
     function deleteAllCommentsOfTweet(address _from, uint256 _tweetId)
-        public
+        external
         onlyController
         returns (bool)
     {

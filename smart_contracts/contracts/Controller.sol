@@ -2,24 +2,31 @@
 pragma solidity ^0.8.9;
 
 import "./utils/BaseController.sol";
-import "./ContractManager.sol";
-import "./TweetStorage.sol";
-import "./UserStorage.sol";
-import "./CommentStorage.sol";
+import "./interfaces/IContractManager.sol";
+import "./interfaces/IController.sol";
+import "./interfaces/ITweetStorage.sol";
+import "./interfaces/IUserStorage.sol";
+import "./interfaces/ICommentStorage.sol";
 
-contract Controller is BaseController {
-    TweetStorage _tweetStorage;
-    UserStorage _userStorage;
-    CommentStorage _commentStorage;
+contract Controller is BaseController, IController {
+    ITweetStorage public _tweetStorage;
+    IUserStorage public _userStorage;
+    ICommentStorage public _commentStorage;
 
-    function initialize() public onlyOwner {
-        ContractManager _manager = ContractManager(managerAddr);
-        address _userStorageAddr = _manager.getAddress("UserStorage");
-        address _tweetStorageAddr = _manager.getAddress("TweetStorage");
-        address _commentStorageAddr = _manager.getAddress("CommentStorage");
-        _tweetStorage = TweetStorage(_tweetStorageAddr);
-        _userStorage = UserStorage(_userStorageAddr);
-        _commentStorage = CommentStorage(_commentStorageAddr);
+    function setStorageAddrs() external onlyOwner {
+        IContractManager _contractManager = IContractManager(managerAddr);
+        address _userStorageAddr = _contractManager.storageAddrs(
+            bytes32(bytes("UserStorage"))
+        );
+        address _tweetStorageAddr = _contractManager.storageAddrs(
+            bytes32(bytes("TweetStorage"))
+        );
+        address _commentStorageAddr = _contractManager.storageAddrs(
+            bytes32(bytes("CommentStorage"))
+        );
+        _tweetStorage = ITweetStorage(_tweetStorageAddr);
+        _userStorage = IUserStorage(_userStorageAddr);
+        _commentStorage = ICommentStorage(_commentStorageAddr);
     }
 
     function createUser(bytes32 _username, string memory _image_uri)
@@ -29,20 +36,20 @@ contract Controller is BaseController {
         return _userStorage.createUser(msg.sender, _username, _image_uri);
     }
 
-    function deleteMyProfileAndAll() public {
+    function deleteMyProfileAndAll() external {
         _userStorage.deleteUser(msg.sender);
         _tweetStorage.deleteAllTweetsOfUser(msg.sender);
     }
 
     function createTweet(string memory _text, string memory _photoUri)
-        public
+        external
         returns (uint256)
     {
         require(_userStorage._exists(msg.sender), "User does not exist");
         return _tweetStorage.createTweet(msg.sender, _text, _photoUri);
     }
 
-    function deleteTweet(uint256 _tweetId) public {
+    function deleteTweet(uint256 _tweetId) external {
         _tweetStorage.deleteTweet(msg.sender, _tweetId);
         _commentStorage.deleteAllCommentsOfTweet(msg.sender, _tweetId);
     }
@@ -51,7 +58,7 @@ contract Controller is BaseController {
         uint256 _tweetId,
         string memory _text,
         string memory _photoUri
-    ) public returns (uint256) {
+    ) external returns (uint256) {
         require(_tweetStorage._exists(_tweetId), "Tweet does not exist");
         return
             _commentStorage.createComment(
@@ -62,7 +69,7 @@ contract Controller is BaseController {
             );
     }
 
-    function deleteComment(uint256 _commentId) public {
+    function deleteComment(uint256 _commentId) external {
         _commentStorage.deleteComment(msg.sender, _commentId);
     }
 }
