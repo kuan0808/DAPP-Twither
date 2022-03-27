@@ -10,7 +10,7 @@ contract CommentStorage is BaseStorage, ICommentStorage {
         address indexed _author,
         uint256 indexed _tweetId,
         uint256 commentId,
-        uint256 _timestamp,
+        uint256 _timestamp
     );
 
     event CommentDeleted(
