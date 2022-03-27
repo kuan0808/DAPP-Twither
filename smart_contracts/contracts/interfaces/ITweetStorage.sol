@@ -10,7 +10,8 @@ interface ITweetStorage {
             uint256 tweetId,
             string memory text,
             uint256 timestamp,
-            string memory photo_uri
+            string memory photo_uri,
+            bool deleted
         );
 
     function _exists(uint256 _tweetId) external view returns (bool);

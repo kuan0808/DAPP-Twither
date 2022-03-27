@@ -20,7 +20,7 @@ contract TweetStorage is BaseStorage, ITweetStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tweetCount;
     // Mapping from author to list of owned tweetIds
-    mapping(address => uint256[]) public _ownedTweets;
+    mapping(address => uint256[]) private _ownedTweets;
 
     // Mapping from tweetId to index of the author's tweets list
     mapping(uint256 => uint256) private _ownedTweetsIndex;
@@ -40,6 +40,7 @@ contract TweetStorage is BaseStorage, ITweetStorage {
         string text;
         uint256 timestamp;
         string photoUri;
+        bool deleted;
     }
 
     function _exists(uint256 _tweetId)
@@ -66,11 +67,11 @@ contract TweetStorage is BaseStorage, ITweetStorage {
     function _removeTweetFromAuthor(address _from, uint256 _tweetId) private {
         require(
             authorOf(_tweetId) == _from,
-            "UserStorage: user does not own this tweet"
+            "TweetStorage: User does not own this tweet"
         );
         require(
             _ownedTweets[_from].length > 0,
-            "UserStorage: user has no tweets"
+            "TweetStorage: User has no tweets"
         );
         uint256 lastIndex = _ownedTweets[_from].length - 1;
         uint256 tweetIndex = _ownedTweetsIndex[_tweetId];
@@ -126,7 +127,8 @@ contract TweetStorage is BaseStorage, ITweetStorage {
             newTweetId,
             _text,
             block.timestamp,
-            _photoUri
+            _photoUri,
+            false
         );
         emit TweetCreated(_userAddr, newTweetId, block.timestamp);
         return newTweetId;
@@ -144,6 +146,7 @@ contract TweetStorage is BaseStorage, ITweetStorage {
         _removeTweetFromAuthor(_from, _tweetId);
         _removeTweetFromAllTweets(_tweetId);
         delete tweets[_tweetId];
+        tweets[_tweetId].deleted = true;
         emit TweetDeleted(_from, _tweetId, block.timestamp);
     }
 

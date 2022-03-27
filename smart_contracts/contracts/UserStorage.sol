@@ -52,7 +52,7 @@ contract UserStorage is BaseStorage, IUserStorage {
         bytes32 _username,
         string memory _image_uri
     ) external onlyController returns (uint256) {
-        require(!_exists(_userAddr), "User already exists");
+        require(!_exists(_userAddr), "UserStorage: User already exists");
         _userCount.increment();
         uint256 newUserId = _userCount.current();
         profiles[_userAddr] = Profile(
@@ -69,7 +69,7 @@ contract UserStorage is BaseStorage, IUserStorage {
     }
 
     function deleteUser(address _from) external onlyController {
-        require(_exists(_from), "User does not exist");
+        require(_exists(_from), "UserStorage: User does not exist");
         uint256 userId = profiles[_from].userId;
         uint256 lastIndex = _allUserIds.length - 1;
         uint256 userIndex = _userIndex[userId];

@@ -87,8 +87,8 @@ contract CommentStorage is BaseStorage, ICommentStorage {
         private
     {
         require(
-            _commentTo(_commentId) == _tweetId,
-            "This Comment do not belong to this Tweet"
+            commentTo(_commentId) == _tweetId,
+            "CommentStorage: This Comment do not belong to this Tweet"
         );
         uint256 lastIndex = _commentsOfTweet[_tweetId].length - 1;
         uint256 commentIndex = _commentsOfTweetIndex[_commentId];
@@ -106,7 +106,7 @@ contract CommentStorage is BaseStorage, ICommentStorage {
     {
         require(
             authorOf(_commentId) == _authorAddr,
-            "This Comment do not belong to this author"
+            "CommentStorage: This Comment do not belong to this author"
         );
         uint256 lastIndex = _commentsOfAuthor[_authorAddr].length - 1;
         uint256 commentIndex = _commentsOfAuthorIndex[_commentId];
@@ -131,7 +131,7 @@ contract CommentStorage is BaseStorage, ICommentStorage {
         _allComments.pop();
     }
 
-    function _commentTo(uint256 _commentId) private view returns (uint256) {
+    function commentTo(uint256 _commentId) public view returns (uint256) {
         return comments[_commentId].tweetId;
     }
 
@@ -154,7 +154,7 @@ contract CommentStorage is BaseStorage, ICommentStorage {
     {
         require(
             _authorAddr != address(0),
-            "Author address cannot be the zero address"
+            "CommentStorage: Author address cannot be the zero"
         );
         return _commentsOfAuthor[_authorAddr];
     }
@@ -164,7 +164,10 @@ contract CommentStorage is BaseStorage, ICommentStorage {
         view
         returns (uint256)
     {
-        require(_authorAddr != address(0), "User address cannot be zero");
+        require(
+            _authorAddr != address(0),
+            "CommentStorage: Author address cannot be the zero"
+        );
         return _commentsOfAuthor[_authorAddr].length;
     }
 
@@ -181,11 +184,17 @@ contract CommentStorage is BaseStorage, ICommentStorage {
         _addCommentToAllComments(newCommentId);
         comments[newCommentId] = Comment(
             _authorAddr,
-            newCommentId,
             _tweetId,
+            newCommentId,
             _text,
             block.timestamp,
             _photoUri
+        );
+        emit CommentCreated(
+            _authorAddr,
+            _tweetId,
+            newCommentId,
+            block.timestamp
         );
         return newCommentId;
     }
@@ -193,31 +202,22 @@ contract CommentStorage is BaseStorage, ICommentStorage {
     function deleteComment(address _from, uint256 _commentId)
         public
         onlyController
-        returns (bool)
     {
         require(_exists(_commentId), "Comment does not exist");
         require(
-            authorOf(_commentId) == _from,
-            "User does not own this comment"
+            authorOf(_commentId) == _from || _from == owner(),
+            "CommentStorage: User does not own this comment"
         );
 
         _removeCommentFromAuthor(_from, _commentId);
-        _removeCommentFromTweet(_commentTo(_commentId), _commentId);
+        _removeCommentFromTweet(commentTo(_commentId), _commentId);
         _removeCommentFromAllComments(_commentId);
         delete comments[_commentId];
-        return true;
-    }
-
-    function deleteAllCommentsOfTweet(address _from, uint256 _tweetId)
-        external
-        onlyController
-        returns (bool)
-    {
-        uint256 count = _commentsOfTweet[_tweetId].length;
-        for (uint256 i = 0; i < count; i++) {
-            uint256 commentId = _commentsOfTweet[_tweetId][i];
-            deleteComment(_from, commentId);
-        }
-        return true;
+        emit CommentDeleted(
+            _from,
+            commentTo(_commentId),
+            _commentId,
+            block.timestamp
+        );
     }
 }

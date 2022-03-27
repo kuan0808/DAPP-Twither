@@ -9,34 +9,35 @@ import "./interfaces/IUserStorage.sol";
 import "./interfaces/ICommentStorage.sol";
 
 contract Controller is BaseController, IController {
-    ITweetStorage public _tweetStorage;
-    IUserStorage public _userStorage;
-    ICommentStorage public _commentStorage;
+    address public tweetStorageAddr;
+    address public userStorageAddr;
+    address public commentStorageAddr;
 
     function setStorageAddrs() external onlyOwner {
         IContractManager _contractManager = IContractManager(managerAddr);
-        address _userStorageAddr = _contractManager.storageAddrs(
+        userStorageAddr = _contractManager.storageAddrs(
             bytes32(bytes("UserStorage"))
         );
-        address _tweetStorageAddr = _contractManager.storageAddrs(
+        tweetStorageAddr = _contractManager.storageAddrs(
             bytes32(bytes("TweetStorage"))
         );
-        address _commentStorageAddr = _contractManager.storageAddrs(
+        commentStorageAddr = _contractManager.storageAddrs(
             bytes32(bytes("CommentStorage"))
         );
-        _tweetStorage = ITweetStorage(_tweetStorageAddr);
-        _userStorage = IUserStorage(_userStorageAddr);
-        _commentStorage = ICommentStorage(_commentStorageAddr);
     }
 
     function createUser(bytes32 _username, string memory _image_uri)
         public
         returns (uint256)
     {
+        IUserStorage _userStorage = IUserStorage(userStorageAddr);
         return _userStorage.createUser(msg.sender, _username, _image_uri);
     }
 
     function deleteMyProfileAndAll() external {
+        IUserStorage _userStorage = IUserStorage(userStorageAddr);
+        ITweetStorage _tweetStorage = ITweetStorage(tweetStorageAddr);
+        _userStorage = IUserStorage(userStorageAddr);
         _userStorage.deleteUser(msg.sender);
         _tweetStorage.deleteAllTweetsOfUser(msg.sender);
     }
@@ -45,13 +46,18 @@ contract Controller is BaseController, IController {
         external
         returns (uint256)
     {
-        require(_userStorage._exists(msg.sender), "User does not exist");
+        ITweetStorage _tweetStorage = ITweetStorage(tweetStorageAddr);
+        IUserStorage _userStorage = IUserStorage(userStorageAddr);
+        require(
+            _userStorage._exists(msg.sender),
+            "UserStorage: User does not exist"
+        );
         return _tweetStorage.createTweet(msg.sender, _text, _photoUri);
     }
 
     function deleteTweet(uint256 _tweetId) external {
+        ITweetStorage _tweetStorage = ITweetStorage(tweetStorageAddr);
         _tweetStorage.deleteTweet(msg.sender, _tweetId);
-        _commentStorage.deleteAllCommentsOfTweet(msg.sender, _tweetId);
     }
 
     function createComment(
@@ -59,7 +65,12 @@ contract Controller is BaseController, IController {
         string memory _text,
         string memory _photoUri
     ) external returns (uint256) {
-        require(_tweetStorage._exists(_tweetId), "Tweet does not exist");
+        ICommentStorage _commentStorage = ICommentStorage(commentStorageAddr);
+        ITweetStorage _tweetStorage = ITweetStorage(tweetStorageAddr);
+        require(
+            _tweetStorage._exists(_tweetId),
+            "TweetStorage: Tweet does not exist"
+        );
         return
             _commentStorage.createComment(
                 msg.sender,
@@ -70,6 +81,7 @@ contract Controller is BaseController, IController {
     }
 
     function deleteComment(uint256 _commentId) external {
+        ICommentStorage _commentStorage = ICommentStorage(commentStorageAddr);
         _commentStorage.deleteComment(msg.sender, _commentId);
     }
 }

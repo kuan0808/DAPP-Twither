@@ -2,6 +2,12 @@
 pragma solidity ^0.8.9;
 
 interface IController {
+    function userStorageAddr() external returns (address);
+
+    function tweetStorageAddr() external returns (address);
+
+    function commentStorageAddr() external returns (address);
+
     function setStorageAddrs() external;
 
     function createUser(bytes32 _username, string memory _image_uri)

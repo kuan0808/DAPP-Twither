@@ -18,6 +18,8 @@ interface ICommentStorage {
 
     function authorOf(uint256 _commentId) external view returns (address);
 
+    function commentTo(uint256 _commentId) external view returns (uint256);
+
     function commentsOfTweet(uint256 _tweetId)
         external
         view
@@ -40,11 +42,5 @@ interface ICommentStorage {
         string memory _photoUri
     ) external returns (uint256);
 
-    function deleteComment(address _from, uint256 _commentId)
-        external
-        returns (bool);
-
-    function deleteAllCommentsOfTweet(address _from, uint256 _tweetId)
-        external
-        returns (bool);
+    function deleteComment(address _from, uint256 _commentId) external;
 }
