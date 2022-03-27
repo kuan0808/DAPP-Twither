@@ -5,9 +5,8 @@ let fs = require("fs"),
 
 exports.contractJsonMaker = async function create_json(contractInfo) {
   let contracts = {};
-  if (!fs.readFileSync(filePath) === "{}") {
-    contracts = JSON.parse(fs.readFileSync(filePath));
-  } else {
+  if (fs.readFileSync(filePath, "utf8") === "{}") {
+    console.log("Initializing contracts.json");
     const [
       userStorageArtifact,
       tweetStorageArtifact,
@@ -44,6 +43,9 @@ exports.contractJsonMaker = async function create_json(contractInfo) {
       },
     };
     fs.writeFileSync(filePath, JSON.stringify(contracts, null, 2));
+  } else {
+    console.log("Reading existing contracts.json");
+    contracts = JSON.parse(fs.readFileSync(filePath, "utf8"));
   }
   Object.keys(contractInfo).forEach((key) => {
     contracts[key].address = contractInfo[key].address;
