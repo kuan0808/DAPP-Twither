@@ -6,6 +6,14 @@ import {
   PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
+import {
+  addDoc,
+  collection,
+  doc,
+  serverTimestamp,
+  updateDoc,
+} from "@firebase/firestore";
+import { getDownloadURL, ref, uploadString } from "@firebase/storage";
 import clsx from "clsx";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
