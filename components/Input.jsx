@@ -19,6 +19,8 @@ import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import { useSession } from "next-auth/react";
 
+import { db } from "../lib/firebase";
+
 const Input = () => {
   const { data: session } = useSession();
   const [input, setInput] = useState("");
