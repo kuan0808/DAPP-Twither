@@ -19,8 +19,6 @@ export default NextAuth({
         .toLocaleLowerCase();
 
       session.user.uid = token.sub;
-      console.log(token);
-      console.log(session);
       return session;
     },
   },
