@@ -10,18 +10,17 @@ dotenv.config();
 module.exports = {
   solidity: "0.8.9",
   networks: {
-    localhost: {
-      url: "http://localhost:8545",
-      privateKey:
-        "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
-    },
     rinkeby: {
       url: process.env.ALCHEMY_RINKEBY_RPC_URL,
-      accounts: [process.env.RINKEBY_PRIVATE_KEY],
+      accounts: [process.env.PRIVATE_KEY],
     },
     ropsten: {
       url: process.env.ALCHEMY_ROPSTEN_RPC_URL,
-      accounts: [process.env.ROPSTEN_PRIVATE_KEY],
+      accounts: [process.env.PRIVATE_KEY],
+    },
+    harmony: {
+      url: `https://api.s0.b.hmny.io`,
+      accounts: [`0x${process.env.PRIVATE_KEY}`],
     },
   },
   etherscan: {
