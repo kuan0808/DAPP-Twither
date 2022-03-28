@@ -14,7 +14,6 @@ const Feed = () => {
       onSnapshot(
         query(collection(db, "tweets"), orderBy("timestamp", "desc")),
         (snapshot) => {
-          console.log(snapshot.docs);
           setTweets(snapshot.docs);
         }
       ),
