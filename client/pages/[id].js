@@ -43,7 +43,7 @@ function TweetPage({ trendingResults, followResults }) {
     <div>
       <Head>
         <title>
-          {tweet?.username} on Twitter: "{tweet?.text}"
+          {tweet?.username} on Twitter: &quot;{tweet?.text}&quot;
         </title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
