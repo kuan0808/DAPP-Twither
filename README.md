@@ -4,7 +4,7 @@ Next Twitter
 
 ## Demo link
 
-Access my site at (<https://next-twitter-kuannnn.vercel.app>)
+Access my site at (<https://next-twitter-kuannnn.netlify.app>)
 
 ## Table of Content
 
