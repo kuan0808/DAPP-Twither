@@ -31,7 +31,7 @@ const Input = () => {
   const filePickerRef = useRef(null);
   const textAreaRef = useRef(null);
 
-  const addImageToPost = (e) => {
+  const addImageToTweet = (e) => {
     const reader = new FileReader();
     if (e.target.files.length) {
       reader.readAsDataURL(e.target.files[0]);
@@ -53,12 +53,12 @@ const Input = () => {
     setInput(result);
   };
 
-  const submitPost = async () => {
+  const submitTweet = async () => {
     if (loading) return;
     setLoading(true);
     setShowEmojis(false);
 
-    const docRef = await addDoc(collection(db, "posts"), {
+    const docRef = await addDoc(collection(db, "tweets"), {
       id: session.user.uid,
       username: session.user.name,
       userImg: session.user.image,
@@ -67,12 +67,12 @@ const Input = () => {
       timestamp: serverTimestamp(),
     });
 
-    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+    const imageRef = ref(storage, `tweets/${docRef.id}/image`);
 
     if (selectedFile) {
       await uploadString(imageRef, selectedFile, "data_url").then(async () => {
         const downloadURL = await getDownloadURL(imageRef);
-        await updateDoc(doc(db, "posts", docRef.id), {
+        await updateDoc(doc(db, "tweets", docRef.id), {
           image: downloadURL,
         });
       });
@@ -134,7 +134,7 @@ const Input = () => {
                 <input
                   type="file"
                   hidden
-                  onChange={addImageToPost}
+                  onChange={addImageToTweet}
                   ref={filePickerRef}
                 />
               </div>
@@ -167,7 +167,7 @@ const Input = () => {
             <button
               className="bg-[#1d9bf0] text-white rounded-full px-4 py-1.5 font-bold shadow-md hover:bg-[#1a8cd8] disabled:hover:bg-[#1d9bf0] disabled:opacity-50 disabled:cursor-default"
               disabled={!input.trim() && !selectedFile}
-              onClick={submitPost}
+              onClick={submitTweet}
             >
               Tweet
             </button>
